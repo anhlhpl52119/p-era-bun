@@ -1,0 +1,48 @@
+{
+  "name": "electrobun-vue",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Electrobun app with Vue and Vite HMR",
+  "scripts": {
+    "start": "bun run build:view && electrobun dev",
+    "dev": "bun run build:view && electrobun dev --watch",
+    "dev:hmr": "bun run build:view && concurrently --kill-others --names vite,electrobun \"bun run hmr\" \"wait-on --timeout 30000 http://localhost:5173 && electrobun dev\"",
+    "hmr": "vite --host localhost --port 5173",
+    "typecheck:app": "vue-tsc -p tsconfig.app.json --noEmit",
+    "typecheck:bun": "tsc -p tsconfig.bun.json --noEmit",
+    "typecheck:build": "tsc -p tsconfig.build.json --noEmit",
+    "typecheck": "bun run typecheck:app && bun run typecheck:bun && bun run typecheck:build",
+    "build:view": "vite build",
+    "build:dev": "bun run typecheck && bun run build:view && electrobun build --env=dev",
+    "build:canary": "bun run typecheck && bun run build:view && electrobun build --env=canary",
+    "build:stable": "bun run typecheck && bun run build:view && electrobun build --env=stable",
+    "build": "bun run build:stable",
+    "history:backfill": "bun scripts/backfill-commit-history.ts"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@vueuse/core": "^14.4.0",
+    "ai": "^7.0.66",
+    "electrobun": "1.18.1",
+    "pinia": "^4.0.3",
+    "tailwindcss": "^4.3.3",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^9.2.0",
+    "@types/bun": "latest",
+    "@types/three": "^0.185.4",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/tsconfig": "^0.9.1",
+    "concurrently": "^10.0.5",
+    "eslint": "^10.7.0",
+    "eslint-plugin-format": "^2.0.1",
+    "prettier": "^3.9.6",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "typescript": "~6.0.2",
+    "vite": "^6.0.3",
+    "vue": "^3.5.39",
+    "vue-tsc": "^3.3.5",
+    "wait-on": "^9.1.0"
+  }
+}

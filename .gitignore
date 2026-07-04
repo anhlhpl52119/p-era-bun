@@ -1,0 +1,9 @@
+node_modules/
+build/
+dist/
+artifacts/
+*.tsbuildinfo
+settings.dev.json
+settings.json
+.DS_Store
+settings.dev.json
