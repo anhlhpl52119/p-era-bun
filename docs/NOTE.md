@@ -11,3 +11,8 @@ Upstream issue: https://github.com/blackboardsh/electrobun/issues/357
 
 - Patch đề xuất detach Inspector trước khi show, nhưng PR đã đóng/chưa merge:
   https://github.com/blackboardsh/electrobun/pull/398
+
+## Zscaler certificate
+
+- Hiện tại máy cài Zscaler ở SGVN chưa thể chạy với stream của Vercel AI Server
+- Chỉ có thể chạy local trước hoặc tắt Zscaler đi

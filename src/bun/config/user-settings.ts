@@ -12,7 +12,7 @@ type SettingsFile = Partial<UserSettings> & {
   vercelApiKey?: unknown;
 };
 
-function getConfigDir(): string {
+export function getConfigDir(): string {
   const rootDir = homedir();
 
   if (process.platform === "darwin") {
