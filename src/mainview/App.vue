@@ -61,6 +61,7 @@ async function saveSettings() {
 onMounted(() => {
   void loadSettings();
 });
+
 function handleInputFile(e: Event) {
   const target = e.currentTarget as HTMLInputElement;
   const [f] = target.files || [];
@@ -88,7 +89,12 @@ async function handleOpenSelectWd() {
       <button @click="handleOpenSelectWd">
         Select Wd {{ wd }}
       </button>
-      <input id="folder-picker" type="file" webkitdirectory @input="handleInputFile">
+      <input
+        id="folder-picker"
+        type="file"
+        webkitdirectory
+        @input="handleInputFile"
+      >
 
       <h1>Vue + Electrobun</h1>
 
@@ -96,16 +102,23 @@ async function handleOpenSelectWd() {
         A fast desktop app with hot module replacement
       </p>
 
-      <section class="mt-12  card      flex settings-card">
+      <section class="card settings-card absolute mt-12 flex">
         <h2>Settings</h2>
         <form @submit.prevent="saveSettings">
           <label for="vercel-ai-key">Vercel AI Key</label>
           <input
-            id="vercel-ai-key" v-model="vercelAiKey" autocomplete="off"
-            placeholder="Enter your Vercel AI Gateway key" :disabled="settingsLoading || settingsSaving"
+            id="vercel-ai-key"
+            v-model="vercelAiKey"
+            autocomplete="off"
+            placeholder="Enter your Vercel AI Gateway key"
+            :disabled="settingsLoading || settingsSaving"
           >
           <div class="settings-actions">
-            <button class="primary" type="submit" :disabled="settingsLoading || settingsSaving">
+            <button
+              class="primary"
+              type="submit"
+              :disabled="settingsLoading || settingsSaving"
+            >
               {{ settingsSaving ? "saving..." : "Save settings" }}
             </button>
             <span v-if="settingsSaved" class="success">Saved.</span>
@@ -121,10 +134,15 @@ async function handleOpenSelectWd() {
         <pre class="msg-code">{{ messages || "no message yet" }}</pre>
         <p>
           Click the button below to test Vue reactivity. With HMR enabled, you
-          can edit this component and see changes instantly without losing state.
+          can edit this component and see changes instantly without losing
+          state.
         </p>
         <div class="button-group">
-          <button class="primary" :disabled="loading" @click="submit('hãy giới thiệu về bạn')">
+          <button
+            class="primary"
+            :disabled="loading"
+            @click="submit('hãy giới thiệu về bạn')"
+          >
             {{ loading ? "running..." : "call API" }}
           </button>
           <button v-if="loading" class="secondary" @click="cancel">

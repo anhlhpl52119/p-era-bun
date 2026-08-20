@@ -5,13 +5,13 @@
     "vercel"
   ],
 
-  // ESLint supplies code-quality fixes without formatting conflicts.
+  // Linter & Formatter
   "eslint.format.enable": false,
+  "editor.formatOnSave": false,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "never"
   },
-
   "eslint.validate": [
     "javascript",
     "typescript",
@@ -22,6 +22,10 @@
     "jsonc",
     "yaml"
   ],
+  "[tailwindcss]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
 
   "files.associations": {
     "*.css": "tailwindcss"
