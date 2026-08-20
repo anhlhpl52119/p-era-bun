@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import { Button } from "@/components/ui/button";
 import { useAIStream } from "@/composables/useAIStream";
 import { electroview } from "@/infrastructure/electroview";
 
@@ -86,9 +87,9 @@ async function handleOpenSelectWd() {
   <main>
     <div class="container">
       <!-- HTML Element -->
-      <button @click="handleOpenSelectWd">
+      <Button @click="handleOpenSelectWd">
         Select Wd {{ wd }}
-      </button>
+      </Button>
 
       <hr>
       <div class="bg-red-200 min-h-30">
@@ -120,13 +121,13 @@ async function handleOpenSelectWd() {
             :disabled="settingsLoading || settingsSaving"
           >
           <div class="settings-actions">
-            <button
+            <Button
               class="primary"
               type="submit"
               :disabled="settingsLoading || settingsSaving"
             >
               {{ settingsSaving ? "saving..." : "Save settings" }}
-            </button>
+            </Button>
             <span v-if="settingsSaved" class="success">Saved.</span>
             <span v-if="settingsError" class="error">{{ settingsError }}</span>
           </div>
@@ -144,16 +145,16 @@ async function handleOpenSelectWd() {
           state.
         </p>
         <div class="button-group">
-          <button
+          <Button
             class="primary"
             :disabled="loading"
             @click="submit('hãy giới thiệu về bạn')"
           >
             {{ loading ? "running..." : "call API" }}
-          </button>
-          <button v-if="loading" class="secondary" @click="cancel">
+          </Button>
+          <Button v-if="loading" class="secondary" @click="cancel">
             cancel
-          </button>
+          </Button>
           <pre v-if="text" class="result">{{ text }}</pre>
 
           <hr>

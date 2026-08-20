@@ -3,8 +3,8 @@
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "paths": {
-      "@shared/*": ["./src/shared/*"],
-      "@/*": ["./src/mainview/*"]
+      "@/*": ["./src/mainview/*"],
+      "@shared/*": ["./src/shared/*"]
     },
     "types": ["vite/client"],
     "allowArbitraryExtensions": true,
