@@ -1,8 +1,8 @@
 import { createPinia } from "pinia";
 import { createApp } from "vue";
-import App from "./App.vue";
-import "./app.css";
-import "./infrastructure/electroview";
+import App from "@/App.vue";
+import "@/app.css";
+import "@/infrastructure/electroview";
 
 const pinia = createPinia();
 

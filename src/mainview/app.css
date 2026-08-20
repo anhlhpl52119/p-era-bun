@@ -1,5 +1,1 @@
 @import "tailwindcss";
-
-:root {
-  @apply absolute mt-2 flex leading-0;
-}

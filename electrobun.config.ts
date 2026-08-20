@@ -15,15 +15,30 @@ export default {
         __P_ERA_PROJECT_ROOT__: JSON.stringify(import.meta.dir),
       },
       plugins: [{
-        name: "shared-alias",
+        /** resolve alias start with `@/` and `@share` in `src/bun` */
+        name: "resolve-alias",
         setup(build) {
-          build.onResolve({ filter: /^@shared\// }, args => ({
-            path: path.resolve(
-              import.meta.dir,
-              "src/shared",
-              `${args.path.slice("@shared/".length)}.ts`,
-            ),
-          }));
+          build.onResolve({ filter: /^(@shared\/|@\/)/ }, async (args) => {
+            const isShared = args.path.startsWith("@shared/");
+            const prefix = isShared ? "@shared/" : "@/";
+            const baseDir = isShared ? "src/shared" : "src/bun";
+
+            const relativePath = args.path.slice(prefix.length);
+            const basePath = path.resolve(import.meta.dir, baseDir, relativePath);
+
+            const candidates = [
+              `${basePath}.ts`,
+              path.join(basePath, "index.ts"),
+            ];
+
+            for (const candidate of candidates) {
+              if (await Bun.file(candidate).exists()) {
+                return { path: candidate };
+              }
+            }
+
+            return null;
+          });
         },
       }],
     },

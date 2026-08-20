@@ -2,8 +2,8 @@ import type { EventInput } from "@shared/event";
 import type { ModelTurn } from "@shared/model";
 import { EventType } from "@shared/event";
 import { createGateway, streamText } from "ai";
-import { emit } from "../bus";
-import { loadUserSettings } from "../config/user-settings";
+import { emit } from "@/bus";
+import { loadUserSettings } from "@/config/user-settings";
 
 export interface RunAgentOptions {
   prompt: string;

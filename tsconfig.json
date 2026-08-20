@@ -1,4 +1,11 @@
 {
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "paths": {
+      "@shared/*": ["./src/shared/*"],
+      "@/*": ["./src/mainview/*"]
+    }
+  },
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.bun.json" },

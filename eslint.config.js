@@ -10,5 +10,6 @@ export default antfu({
   rules: {
     "no-console": "warn",
     "antfu/no-top-level-await": "off",
+    "prefer-regex-literals": "off",
   },
 });

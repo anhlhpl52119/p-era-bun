@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { useAIStream } from "./composables/useAIStream";
-import { electroview } from "./infrastructure/electroview";
+import { useAIStream } from "@/composables/useAIStream";
+import { electroview } from "@/infrastructure/electroview";
 
 const messages = ref<any[]>([]);
 const { text, error, loading, submit, cancel } = useAIStream();
@@ -89,6 +89,12 @@ async function handleOpenSelectWd() {
       <button @click="handleOpenSelectWd">
         Select Wd {{ wd }}
       </button>
+
+      <hr>
+      <div class="bg-red-200 min-h-30">
+        <pre class="my-4">{{ error }}</pre>
+      </div>
+      <hr>
       <input
         id="folder-picker"
         type="file"
@@ -102,7 +108,7 @@ async function handleOpenSelectWd() {
         A fast desktop app with hot module replacement
       </p>
 
-      <section class="card settings-card absolute mt-12 flex">
+      <section class="card settings-card">
         <h2>Settings</h2>
         <form @submit.prevent="saveSettings">
           <label for="vercel-ai-key">Vercel AI Key</label>

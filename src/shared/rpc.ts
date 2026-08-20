@@ -1,6 +1,6 @@
+import type { AgentEvent } from "@shared/event";
+import type { UserSettings } from "@shared/settings";
 import type { RPCSchema } from "electrobun";
-import type { AgentEvent } from "./event";
-import type { UserSettings } from "./settings";
 
 export interface MyWebviewRPCType {
   // functions that execute in the main process
