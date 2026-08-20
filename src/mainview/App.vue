@@ -7,6 +7,7 @@ const messages = ref<any[]>([]);
 const { text, error, loading, submit, cancel } = useAIStream();
 const wd = ref("");
 const vercelAiKey = ref("");
+
 const settingsLoading = ref(true);
 const settingsSaving = ref(false);
 const settingsError = ref<string | null>(null);
@@ -95,16 +96,13 @@ async function handleOpenSelectWd() {
         A fast desktop app with hot module replacement
       </p>
 
-      <section class="card settings-card">
+      <section class="mt-12  card      flex settings-card">
         <h2>Settings</h2>
         <form @submit.prevent="saveSettings">
           <label for="vercel-ai-key">Vercel AI Key</label>
           <input
-            id="vercel-ai-key"
-            v-model="vercelAiKey"
-            autocomplete="off"
-            placeholder="Enter your Vercel AI Gateway key"
-            :disabled="settingsLoading || settingsSaving"
+            id="vercel-ai-key" v-model="vercelAiKey" autocomplete="off"
+            placeholder="Enter your Vercel AI Gateway key" :disabled="settingsLoading || settingsSaving"
           >
           <div class="settings-actions">
             <button class="primary" type="submit" :disabled="settingsLoading || settingsSaving">
@@ -118,6 +116,7 @@ async function handleOpenSelectWd() {
       <h2 class="text-red-800">
         Interactive Count
       </h2>
+
       <div class="card">
         <pre class="msg-code">{{ messages || "no message yet" }}</pre>
         <p>

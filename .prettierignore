@@ -1,12 +1,4 @@
 node_modules
 dist
 build
-
-**/*.js
-**/*.jsx
-**/*.ts
-**/*.tsx
-**/*.json
-**/*.md
-**/*.html
-**/*.vue
+artifacts
