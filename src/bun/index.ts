@@ -1,5 +1,5 @@
 import type { AgentEvent } from "@shared/event";
-import { BrowserWindow, Updater } from "electrobun/bun";
+import { ApplicationMenu, BrowserWindow, Updater } from "electrobun/bun";
 import { subscribe } from "@/bus";
 import { rpc } from "@/rpc";
 
@@ -25,6 +25,33 @@ async function getMainViewUrl(): Promise<string> {
 }
 
 async function main() {
+  ApplicationMenu.setApplicationMenu([
+    {
+      submenu: [
+        {
+          label: "Quit",
+          role: "quit",
+          accelerator: "Command+Q",
+        },
+      ],
+    },
+    {
+      label: "Edit",
+      submenu: [
+        { role: "undo" },
+        { role: "quit" },
+        { role: "redo" },
+        { type: "separator" },
+        { role: "cut" },
+        { role: "copy" },
+        { role: "paste" },
+        { role: "pasteAndMatchStyle" },
+        { role: "delete" },
+        { role: "selectAll" },
+      ],
+    },
+  ]);
+
   const bw = new BrowserWindow({
     title: "P-era",
     url: await getMainViewUrl(),

@@ -1,6 +1,17 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useAIStream } from "@/composables/useAIStream";
 import { electroview } from "@/infrastructure/electroview";
 
@@ -96,12 +107,11 @@ async function handleOpenSelectWd() {
         <pre class="my-4">{{ error }}</pre>
       </div>
       <hr>
-      <input
+      <Input
         id="folder-picker"
-        type="file"
-        webkitdirectory
+        type="file" webkitdirectory placeholder="m@example.com"
         @input="handleInputFile"
-      >
+      />
 
       <h1>Vue + Electrobun</h1>
 
@@ -112,14 +122,14 @@ async function handleOpenSelectWd() {
       <section class="card settings-card">
         <h2>Settings</h2>
         <form @submit.prevent="saveSettings">
-          <label for="vercel-ai-key">Vercel AI Key</label>
-          <input
+          <Label for="vercel-ai-key">Vercel AI Key</Label>
+          <Input
             id="vercel-ai-key"
             v-model="vercelAiKey"
             autocomplete="off"
             placeholder="Enter your Vercel AI Gateway key"
             :disabled="settingsLoading || settingsSaving"
-          >
+          />
           <div class="settings-actions">
             <Button
               class="primary"
@@ -164,5 +174,48 @@ async function handleOpenSelectWd() {
         </div>
       </div>
     </div>
+    <Card class="w-full max-w-sm">
+      <CardHeader>
+        <CardTitle>Login to your account</CardTitle>
+        <CardDescription>
+          Enter your email below to login to your account
+        </CardDescription>
+        <CardAction>
+          <Button variant="link">
+            Sign Up
+          </Button>
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        <form>
+          <div class="grid w-full items-center gap-4">
+            <div class="flex flex-col space-y-1.5">
+              <Label for="email">Email</Label>
+              <Input id="email" type="email" placeholder="m@example.com" />
+            </div>
+            <div class="flex flex-col space-y-1.5">
+              <div class="flex items-center">
+                <Label for="password">Password</Label>
+                <a
+                  href="#"
+                  class="ml-auto inline-block text-sm underline"
+                >
+                  Forgot your password?
+                </a>
+              </div>
+              <Input id="password" type="password" />
+            </div>
+          </div>
+        </form>
+      </CardContent>
+      <CardFooter class="flex flex-col gap-2">
+        <Button class="w-full">
+          Login
+        </Button>
+        <Button variant="outline" class="w-full">
+          Login with Google
+        </Button>
+      </CardFooter>
+    </Card>
   </main>
 </template>
