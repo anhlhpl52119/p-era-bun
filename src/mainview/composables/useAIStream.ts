@@ -1,7 +1,7 @@
-import type { AgentStream } from "../infrastructure/electroview";
+import type { AgentStream } from "../electroview";
 import { EventType } from "@shared/event";
 import { onUnmounted, ref } from "vue";
-import { startAgentStream } from "../infrastructure/electroview";
+import { startAgentStream } from "../electroview";
 
 export function useAIStream() {
   const text = ref("");

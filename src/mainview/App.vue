@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAIStream } from "@/composables/useAIStream";
-import { electroview } from "@/infrastructure/electroview";
+import { electroview } from "@/electroview";
 
 const messages = ref<any[]>([]);
 const { text, error, loading, submit, cancel } = useAIStream();

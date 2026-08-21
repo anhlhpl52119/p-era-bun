@@ -3,7 +3,7 @@ import { createApp } from "vue";
 import { createMemoryHistory, createRouter } from "vue-router";
 import App from "@/App.vue";
 import "@/styles/index.css";
-import "@/infrastructure/electroview";
+import "@/electroview";
 
 const pinia = createPinia();
 
