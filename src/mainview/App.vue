@@ -96,7 +96,20 @@ async function handleOpenSelectWd() {
 
 <template>
   <main>
+    <ul>
+      <li>
+        <RouterLink to="/">
+          go home
+        </RouterLink>
+      </li>
+      <li>
+        <RouterLink to="/regis">
+          Go register
+        </RouterLink>
+      </li>
+    </ul>
     <div class="container">
+      <RouterView />
       <!-- HTML Element -->
       <Button @click="handleOpenSelectWd">
         Select Wd {{ wd }}
