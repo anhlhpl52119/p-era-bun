@@ -29,6 +29,7 @@
     "electrobun": "1.18.1",
     "pinia": "^4.0.3",
     "reka-ui": "^2.10.3",
+    "shadcn-vue": "^2.8.2",
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.3",
     "vue-router": "^5.2.0",
