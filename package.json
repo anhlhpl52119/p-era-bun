@@ -5,8 +5,7 @@
   "description": "Electrobun app with Vue and Vite HMR",
   "scripts": {
     "start": "bun run build:view && electrobun dev",
-    "dev": "bun run build:view && electrobun dev --watch",
-    "dev:hmr": "bun run build:view && concurrently --kill-others --names vite,electrobun \"bun run hmr\" \"wait-on --timeout 30000 http://localhost:5173 && electrobun dev\"",
+    "dev": "bun run build:view && concurrently --kill-others --names vite,electrobun \"bun run hmr\" \"wait-on --timeout 30000 http://localhost:5173 && electrobun dev\"",
     "hmr": "vite --host localhost --port 5173",
     "typecheck:app": "vue-tsc -p tsconfig.app.json --noEmit",
     "typecheck:bun": "tsc -p tsconfig.bun.json --noEmit",
