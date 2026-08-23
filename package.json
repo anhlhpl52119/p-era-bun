@@ -27,6 +27,8 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "electrobun": "1.18.1",
+    "lucide": "^1.33.0",
+    "morphicons": "^1.7.0",
     "pinia": "^4.0.3",
     "reka-ui": "^2.10.3",
     "shadcn-vue": "^2.8.2",
