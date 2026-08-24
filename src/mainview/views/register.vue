@@ -1,5 +1,5 @@
 <script setup>
-import { ArrowDown, Menu, X } from "lucide";
+import { ArrowDown, X } from "lucide";
 import { MorphIcon } from "morphicons/vue";
 import { ref } from "vue";
 import { Button } from "@/components/ui/button";
