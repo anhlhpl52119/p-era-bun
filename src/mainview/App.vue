@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { defineAsyncComponent, onMounted, ref } from "vue";
 import { electroview } from "@/electroview";
 
 const vercelAiKey = ref("");
-
 const settingsLoading = ref(true);
 const settingsError = ref<string | null>(null);
+const defaultLayout = defineAsyncComponent(() => import("@/layouts/DefaultLayout.vue"));
+const adminLayout = defineAsyncComponent(() => import("@/layouts/AdminLayout.vue"));
 
 function getRpc() {
   const rpc = electroview.rpc;
@@ -34,12 +35,17 @@ async function loadSettings() {
 onMounted(() => {
   void loadSettings();
 });
+
+const layouts: Record<string, any> = {
+  default: defaultLayout,
+  admin: adminLayout,
+};
 </script>
 
 <template>
-  <main>
-    <div class="container">
-      <RouterView />
-    </div>
-  </main>
+  <RouterView v-slot="{ Component, route }">
+    <component :is="layouts[route.meta.layout as string || 'default']">
+      <component :is="Component" />
+    </component>
+  </RouterView>
 </template>

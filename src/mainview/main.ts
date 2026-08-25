@@ -11,8 +11,8 @@ const router = createRouter({
   history: createMemoryHistory(),
   routes: [
     { name: "home", path: "/", component: () => import("@/views/index.vue") },
-    { name: "register", path: "/regis", component: () => import("@/views/register.vue") },
-    { name: "register", path: "/regis", component: () => import("@/views/register.vue") },
+    { name: "register", path: "/regis", component: () => import("@/views/register.vue"), meta: { layout: "admin" } },
+    { name: "legacy", path: "/legacy", component: () => import("@/views/legacy-app.vue") },
   ],
 });
 
