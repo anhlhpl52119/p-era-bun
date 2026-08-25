@@ -1,9 +1,14 @@
+import { useColorMode } from "@vueuse/core";
 import { createPinia } from "pinia";
 import { createApp } from "vue";
 import { createMemoryHistory, createRouter } from "vue-router";
 import App from "@/App.vue";
 import "@/styles/main.css";
 import "@/electroview";
+
+useColorMode({
+  modes: { dark: "dark" },
+});
 
 const pinia = createPinia();
 
