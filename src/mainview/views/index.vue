@@ -151,132 +151,118 @@ function handleRegenerate() {
 </script>
 
 <template>
-  <div class="relative mx-auto size-full h-screen max-w-4xl p-6">
-    <ul>
-      <li>
-        <RouterLink to="/">
-          go home
-        </RouterLink>
-      </li>
-      <li>
-        <RouterLink to="/regis">
-          Go register
-        </RouterLink>
-      </li>
-    </ul>
-    <div class="flex h-full flex-col">
-      <Conversation class="h-full">
-        <ConversationContent>
-          <div
-            v-for="message in messages"
-            :key="message.id"
+  <div class="flex h-full flex-col">
+    <Conversation class="h-full">
+      <ConversationContent>
+        <div
+          v-for="message in messages"
+          :key="message.id"
+        >
+          <Sources
+            v-if="message.role === 'assistant' && getSourceUrlParts(message).length > 0"
           >
-            <Sources
-              v-if="message.role === 'assistant' && getSourceUrlParts(message).length > 0"
+            <SourcesTrigger :count="getSourceUrlParts(message).length" />
+            <SourcesContent
+              v-for="(source, index) in getSourceUrlParts(message)"
+              :key="`${message.id}-source-${index}`"
             >
-              <SourcesTrigger :count="getSourceUrlParts(message).length" />
-              <SourcesContent
-                v-for="(source, index) in getSourceUrlParts(message)"
-                :key="`${message.id}-source-${index}`"
-              >
-                <Source
-                  :href="source.url"
-                  :title="source.title ?? source.url"
-                />
-              </SourcesContent>
-            </Sources>
+              <Source
+                :href="source.url"
+                :title="source.title ?? source.url"
+              />
+            </SourcesContent>
+          </Sources>
 
-            <template
-              v-for="(part, partIndex) in message.parts"
-              :key="`${message.id}-${partIndex}`"
+          <template
+            v-for="(part, partIndex) in message.parts"
+            :key="`${message.id}-${partIndex}`"
+          >
+            <Message
+              v-if="part.type === 'text'"
+              :from="message.role"
             >
-              <Message
-                v-if="part.type === 'text'"
-                :from="message.role"
-              >
-                <div>
-                  <MessageContent>
-                    <MessageResponse :content="part.text" />
-                  </MessageContent>
+              <div>
+                <MessageContent>
+                  <MessageResponse :content="part.text" />
+                </MessageContent>
 
-                  <MessageActions v-if="shouldShowActions(message, partIndex)">
-                    <MessageAction
-                      label="Retry"
-                      @click="handleRegenerate"
-                    >
-                      <RefreshCcwIcon class="size-3" />
-                    </MessageAction>
-                    <MessageAction
-                      label="Copy"
-                      @click="copyToClipboard(part.text)"
-                    >
-                      <CopyIcon class="size-3" />
-                    </MessageAction>
-                  </MessageActions>
-                </div>
-              </Message>
+                <MessageActions v-if="shouldShowActions(message, partIndex)">
+                  <MessageAction
+                    label="Retry"
+                    @click="handleRegenerate"
+                  >
+                    <RefreshCcwIcon class="size-3" />
+                  </MessageAction>
+                  <MessageAction
+                    label="Copy"
+                    @click="copyToClipboard(part.text)"
+                  >
+                    <CopyIcon class="size-3" />
+                  </MessageAction>
+                </MessageActions>
+              </div>
+            </Message>
 
-              <Reasoning
-                v-else-if="part.type === 'reasoning'"
-                class="w-full"
-                :is-streaming="isReasoningStreaming(message, partIndex)"
-              >
-                <ReasoningTrigger />
-                <ReasoningContent :content="part.text" />
-              </Reasoning>
-            </template>
-          </div>
-
-          <Loader v-if="status === 'submitted'" class="mx-auto" />
-        </ConversationContent>
-
-        <ConversationScrollButton />
-      </Conversation>
-
-      <PromptInput class="mt-4" global-drop multiple>
-        <PromptInputBody>
-          <PromptInputTextarea />
-        </PromptInputBody>
-
-        <PromptInputFooter>
-          <PromptInputTools>
-            <PromptInputActionMenu>
-              <PromptInputActionMenuTrigger />
-              <PromptInputActionMenuContent>
-                <PromptInputActionAddAttachments />
-              </PromptInputActionMenuContent>
-            </PromptInputActionMenu>
-
-            <PromptInputButton
-              :variant="webSearch ? 'default' : 'ghost'"
-              @click="toggleWebSearch"
+            <Reasoning
+              v-else-if="part.type === 'reasoning'"
+              class="w-full"
+              :is-streaming="isReasoningStreaming(message, partIndex)"
             >
-              <GlobeIcon class="size-4" />
-              <span>Search</span>
-            </PromptInputButton>
+              <ReasoningTrigger />
+              <ReasoningContent :content="part.text" />
+            </Reasoning>
+          </template>
+        </div>
 
-            <PromptInputSelect v-model="model">
-              <PromptInputSelectTrigger>
-                <PromptInputSelectValue />
-              </PromptInputSelectTrigger>
-              <PromptInputSelectContent>
-                <PromptInputSelectItem
-                  v-for="item in models"
-                  :key="item.value"
-                  :value="item.value"
-                >
-                  {{ item.name }}
-                </PromptInputSelectItem>
-              </PromptInputSelectContent>
-            </PromptInputSelect>
-          </PromptInputTools>
+        <Loader v-if="status === 'submitted'" class="mx-auto" />
+      </ConversationContent>
 
-          <PromptInputSubmit
-            :disabled="submitDisabled"
-            :status="status"
-          />
-        </PromptInputFooter>
-      </PromptInput>
-    </div>
+      <ConversationScrollButton />
+    </Conversation>
+
+    <PromptInput class="mt-4" global-drop multiple>
+      <PromptInputBody>
+        <PromptInputTextarea />
+      </PromptInputBody>
+
+      <PromptInputFooter>
+        <PromptInputTools>
+          <PromptInputActionMenu>
+            <PromptInputActionMenuTrigger />
+            <PromptInputActionMenuContent>
+              <PromptInputActionAddAttachments />
+            </PromptInputActionMenuContent>
+          </PromptInputActionMenu>
+
+          <PromptInputButton
+            :variant="webSearch ? 'default' : 'ghost'"
+            @click="toggleWebSearch"
+          >
+            <GlobeIcon class="size-4" />
+            <span>Search</span>
+          </PromptInputButton>
+
+          <PromptInputSelect v-model="model">
+            <PromptInputSelectTrigger>
+              <PromptInputSelectValue />
+            </PromptInputSelectTrigger>
+            <PromptInputSelectContent>
+              <PromptInputSelectItem
+                v-for="item in models"
+                :key="item.value"
+                :value="item.value"
+              >
+                {{ item.name }}
+              </PromptInputSelectItem>
+            </PromptInputSelectContent>
+          </PromptInputSelect>
+        </PromptInputTools>
+
+        <PromptInputSubmit
+          :disabled="submitDisabled"
+          :status="status"
+        />
+      </PromptInputFooter>
+    </PromptInput>
   </div>
 </template>
