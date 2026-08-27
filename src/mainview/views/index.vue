@@ -38,9 +38,11 @@ const models = [
 // const chat = new Chat({});
 const model = ref(models[0].value);
 const webSearch = ref(false);
-const { text, error, loading, submit } = useAIStream();
+const { conversation, loading, submit } = useAIStream();
 
-const status = computed<ChatStatus>(() => "ready");
+const status = computed<ChatStatus>(() =>
+  loading.value ? "streaming" : "ready",
+);
 const messages = computed(() => [] as any);
 const lastMessageId = computed(() => messages.value.at(-1)?.id ?? null);
 const lastAssistantMessageId = computed(() => {
@@ -154,9 +156,8 @@ function handleRegenerate() {
   <div class="flex h-full flex-col">
     <Conversation class="h-full">
       <ConversationContent>
-        {{ text }}
         <div
-          v-for="message in messages"
+          v-for="message in conversation"
           :key="message.id"
         >
           <Sources

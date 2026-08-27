@@ -43,6 +43,7 @@ export async function runAgent({
     const res = streamText({
       model: gateway(modelId),
       prompt,
+      reasoning: "medium",
       abortSignal: signal,
     });
 

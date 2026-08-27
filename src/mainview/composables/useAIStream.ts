@@ -1,10 +1,12 @@
+import type { UIMessage } from "ai";
 import type { AgentStream } from "../electroview";
 import { EventType } from "@shared/event";
-import { onUnmounted, ref } from "vue";
+import { uuid } from "@shared/utils";
+import { onUnmounted, reactive, ref } from "vue";
 import { startAgentStream } from "../electroview";
 
 export function useAIStream() {
-  const text = ref("");
+  const conversation = ref<UIMessage[]>([]);
   const error = ref<string | null>(null);
   const loading = ref(false);
   let activeStream: AgentStream | undefined;
@@ -37,12 +39,16 @@ export function useAIStream() {
     const requestId = ++submissionId;
     loading.value = true;
     error.value = null;
-    text.value = "";
-
+    conversation.value.push({ role: "user", id: uuid(), parts: [{ type: "text", text: prompt }] });
     await disposeActiveStream(true);
     if (requestId !== submissionId) {
       return;
     }
+    const resMessage = reactive({
+      role: "assistant",
+      id: uuid(),
+      parts: [{ type: "text", text: "" }],
+    } satisfies UIMessage);
 
     try {
       const stream = await startAgentStream(prompt);
@@ -51,12 +57,12 @@ export function useAIStream() {
         stream.dispose();
         return;
       }
-
+      conversation.value.push(resMessage);
       activeStream = stream;
       let endedWhileSubscribing = false;
       const streamUnsubscribe = stream.subscribe((event) => {
         if (event.type === EventType.ModelDelta) {
-          text.value += event.text;
+          resMessage.parts[0].text += event.text;
           return;
         }
 
@@ -104,7 +110,7 @@ export function useAIStream() {
   });
 
   return {
-    text,
+    conversation,
     error,
     loading,
     submit,

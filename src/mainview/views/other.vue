@@ -6,7 +6,5 @@ const open = ref(false);
 </script>
 
 <template>
-  <Button :aria-expanded="open" @click="open = !open">
-    <!-- <MorphIcon :icon="open ? X : ArrowDown" /> -->
-  </Button>
+  <Button :aria-expanded="open" @click="open = !open" />
 </template>

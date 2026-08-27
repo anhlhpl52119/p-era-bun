@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import type { LucideIcon } from "@lucide/vue";
-import { ArrowDown, GalleryVerticalEnd } from "@lucide/vue";
-import { MorphIcon } from "morphicons/vue";
+import { GalleryVerticalEndIcon, HashIcon } from "@lucide/vue";
 
 import {
   Sidebar,
@@ -19,25 +17,18 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-
-const icons: Record<string, LucideIcon> = {
-  ArrowDown,
-  GalleryVerticalEnd,
-};
-
-const ar = icons.ArrowDown;
-const ga = icons.GalleryVerticalEnd;
 </script>
 
 <template>
   <SidebarProvider>
+    <!-- side bar -->
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" tooltip="sdsd">
               <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <GalleryVerticalEnd class="size-4" />
+                <GalleryVerticalEndIcon class="size-4" />
               </div>
               <div class="grid flex-1 text-left text-sm leading-tight">
                 <span class="truncate font-semibold">Pexus Era</span>
@@ -55,8 +46,7 @@ const ga = icons.GalleryVerticalEnd;
               <SidebarMenuItem>
                 <SidebarMenuButton v-for="r in $router.getRoutes()" :key="r.name" :is-active="r.name === $route.name" as-child>
                   <RouterLink :to="r.path">
-                    <!-- <component :is="r.meta.icon" /> -->
-                    <MorphIcon :icon="(r.name === $route.name) ? ar : ga" />
+                    <component :is="r.meta.icon || HashIcon" />
                     <span>{{ r.name }}</span>
                   </RouterLink>
                 </SidebarMenuButton>
@@ -75,6 +65,7 @@ const ga = icons.GalleryVerticalEnd;
           <SidebarTrigger class="-ml-1" />
         </div>
       </header>
+      <!-- page content -->
       <div class="flex flex-1 flex-col gap-4 p-4 pt-0">
         <slot />
       </div>
