@@ -154,6 +154,7 @@ function handleRegenerate() {
   <div class="flex h-full flex-col">
     <Conversation class="h-full">
       <ConversationContent>
+        {{ text }}
         <div
           v-for="message in messages"
           :key="message.id"

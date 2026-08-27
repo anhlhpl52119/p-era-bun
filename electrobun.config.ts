@@ -4,7 +4,7 @@ import path from "node:path";
 
 export default {
   app: {
-    name: "vue-app",
+    name: "Pexus",
     identifier: "vueapp.electrobun.dev",
     version: "0.0.1",
   },
@@ -51,12 +51,15 @@ export default {
     watchIgnore: ["dist/**"],
     mac: {
       bundleCEF: false,
+      icons: "assets/icon.iconset",
     },
     linux: {
       bundleCEF: false,
+      icon: "assets/icon.png",
     },
     win: {
       bundleCEF: false,
+      icon: "assets/icon.png",
     },
   },
 } satisfies ElectrobunConfig;
