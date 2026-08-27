@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { GalleryVerticalEnd, Home } from "@lucide/vue";
+import type { LucideIcon } from "@lucide/vue";
+import { ArrowDown, GalleryVerticalEnd } from "@lucide/vue";
+import { MorphIcon } from "morphicons/vue";
 
 import {
   Sidebar,
@@ -17,11 +19,19 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+
+const icons: Record<string, LucideIcon> = {
+  ArrowDown,
+  GalleryVerticalEnd,
+};
+
+const ar = icons.ArrowDown;
+const ga = icons.GalleryVerticalEnd;
 </script>
 
 <template>
   <SidebarProvider>
-    <Sidebar>
+    <Sidebar collapsible="icon">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -43,9 +53,10 @@ import {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton v-for="r in $router.getRoutes()" :key="r.name" as-child>
+                <SidebarMenuButton v-for="r in $router.getRoutes()" :key="r.name" :is-active="r.name === $route.name" as-child>
                   <RouterLink :to="r.path">
-                    <Home />
+                    <!-- <component :is="r.meta.icon" /> -->
+                    <MorphIcon :icon="(r.name === $route.name) ? ar : ga" />
                     <span>{{ r.name }}</span>
                   </RouterLink>
                 </SidebarMenuButton>
@@ -57,6 +68,7 @@ import {
       <SidebarFooter />
       <SidebarRail />
     </Sidebar>
+
     <SidebarInset>
       <header class="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
         <div class="flex items-center gap-2 px-4">

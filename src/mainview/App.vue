@@ -44,7 +44,17 @@ const layouts: Record<string, any> = {
 
 <template>
   <RouterView v-slot="{ Component, route }">
-    <component :is="layouts[route.meta.layout as string || 'default']">
+    <!-- blank -->
+    <component
+      :is="Component"
+      v-if="route.meta.layout === false"
+    />
+
+    <!-- layout -->
+    <component
+      :is="layouts[route.meta.layout as string || 'default']"
+      v-else
+    >
       <component :is="Component" />
     </component>
   </RouterView>
