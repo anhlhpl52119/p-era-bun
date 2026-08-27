@@ -53,7 +53,7 @@ async function main() {
   ]);
 
   const bw = new BrowserWindow({
-    title: "P-era",
+    title: "Pexus",
     url: await getMainViewUrl(),
     rpc,
     frame: {

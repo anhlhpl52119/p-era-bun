@@ -51,7 +51,6 @@ export async function runAgent({
 
       if (chunk.type === "error") {
         // AI SDK reports provider failures as a stream part. Throw the original
-        // error before `res.text` replaces it with a generic NoOutput error.
         throw chunk.error;
       }
 

@@ -12,7 +12,7 @@ export default {
     bun: {
       entrypoint: "src/bun/index.ts",
       define: {
-        __P_ERA_PROJECT_ROOT__: JSON.stringify(import.meta.dir),
+        __PROJECT_ROOT__: JSON.stringify(import.meta.dir),
       },
       plugins: [{
         /** resolve alias start with `@/` and `@share` in `src/bun` */

@@ -6,7 +6,7 @@ import process from "node:process";
 import { defaultUserSettings } from "@shared/settings";
 import { Updater } from "electrobun";
 
-declare const __P_ERA_PROJECT_ROOT__: string;
+declare const __PROJECT_ROOT__: string;
 
 type SettingsFile = Partial<UserSettings> & {
   vercelApiKey?: unknown;
@@ -14,25 +14,26 @@ type SettingsFile = Partial<UserSettings> & {
 
 export function getConfigDir(): string {
   const rootDir = homedir();
+  const appName = "pexus";
 
   if (process.platform === "darwin") {
     // ~/Library/Application Support
-    return join(rootDir, "Library", "Application Support", "P-era");
+    return join(rootDir, "Library", "Application Support", appName);
   }
 
   if (process.platform === "win32") {
     // C:\Users\<user>\AppData\Roaming
-    return join(join(rootDir, "AppData", "Roaming"), "P-era");
+    return join(join(rootDir, "AppData", "Roaming"), appName);
   }
 
-  // linux ~/.config/P-era
-  return join(join(rootDir, ".config"), "P-era");
+  // linux ~/.config/<app_name>
+  return join(join(rootDir, ".config"), appName);
 }
 
 export async function getSettingsPath(): Promise<string> {
   const channel = await Updater.localInfo.channel();
   return channel === "dev"
-    ? resolve(__P_ERA_PROJECT_ROOT__, "settings.dev.json")
+    ? resolve(__PROJECT_ROOT__, "settings.dev.json")
     : join(getConfigDir(), "settings.json");
 }
 
