@@ -7,7 +7,7 @@ export const EventType = {
   ModelDelta: "model.delta",
   ModelCompleted: "model.completed",
   // the model reasoning
-  ModelReasoningDelta: "reasoning.delta",
+  ReasoningDelta: "reasoning.delta",
   ModelReasoningCompleted: "reasoning.completed",
   // a tool call and its outcome
   ToolRequested: "tool.requested",
@@ -35,7 +35,7 @@ export type EventInput
     | { type: typeof EventType.WorkflowFailed; workflowId: string; error: string }
     | { type: typeof EventType.ModelDelta; workflowId: string; text: string }
     | { type: typeof EventType.ModelCompleted; workflowId: string; text: string }
-    | { type: typeof EventType.ModelReasoningDelta; workflowId: string; text: string }
+    | { type: typeof EventType.ReasoningDelta; workflowId: string; text: string }
     | { type: typeof EventType.ModelReasoningCompleted; workflowId: string; text: string }
     | { type: typeof EventType.ToolRequested; workflowId: string; toolCallId: string; name: string; args: unknown }
     | { type: typeof EventType.ToolCompleted; workflowId: string; toolCallId: string; result: unknown }

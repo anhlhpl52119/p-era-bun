@@ -1,7 +1,9 @@
 import type { EventInput } from "@shared/event";
 import type { ModelTurn } from "@shared/model";
+import type { GatewayModelId, LanguageModel, ModelMessage } from "ai";
 import { EventType } from "@shared/event";
-import { createGateway, streamText } from "ai";
+import { createGateway, stepCountIs, streamText } from "ai";
+import { randomUUIDv7 } from "bun";
 import { logAgentError } from "@/config/diagnostics";
 import { loadUserSettings } from "@/config/user-settings";
 import { emit } from "@/runtime/bus";
@@ -126,3 +128,57 @@ export async function runAgent({
     throw error;
   }
 }
+
+interface RunWorkflowOptions {
+  prompts: string;
+  workflowId?: string;
+  abortSignal?: AbortSignal;
+  modelId?: GatewayModelId;
+  reasoning?: "provider-default" | "none" | "minimal" | "low" | "medium" | "high" | "xhigh";
+}
+
+export async function runWorkflow(options: RunWorkflowOptions) {
+  const {
+    workflowId = randomUUIDv7(),
+    modelId = "inclusionai/ling-3.0-flash",
+    prompts,
+    abortSignal,
+    reasoning,
+  } = options;
+
+  const { vercelAiKey } = await loadUserSettings();
+  if (!vercelAiKey) {
+    await emit({ type: EventType.WorkflowFailed, workflowId, error: "Missing vercel API key in config" });
+    throw new Error("Missing vercel API key");
+  }
+
+  const messages: ModelMessage[]= [{
+    role: "user",
+    content: prompts
+  }]
+  
+  try {
+    const gateway = createGateway({ apiKey: vercelAiKey });
+    const res = streamText({
+      model: gateway(modelId),
+      messages,
+      reasoning,
+      abortSignal,
+      stopWhen: stepCountIs(20)
+    });
+
+    for await (const chunk of res.stream) {
+      if (chunk.type === "text-delta") {
+        await emit({ type: EventType.ModelDelta, text: chunk.text, workflowId });
+      }
+      if (chunk.type === "reasoning-delta") {
+        await emit({ type: EventType.ReasoningDelta, text: chunk.text, workflowId });
+      }
+      const toolRequest = chunk.
+    }
+  }
+  catch (err) {
+    emit({ type: EventType.WorkflowFailed, workflowId, error: "Call Agent failed" });
+    throw err;
+  }
+};

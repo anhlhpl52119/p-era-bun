@@ -1,7 +1,7 @@
 import type { AgentEvent } from "@shared/event";
 import { ApplicationMenu, BrowserWindow, Updater } from "electrobun/bun";
-import { rpc } from "@/rpc";
 import { subscribe } from "@/runtime/bus";
+import { rpc } from "@/runtime/rpc";
 
 const DEV_SERVER_PORT = 5173;
 const DEV_SERVER_URL = `http://localhost:${DEV_SERVER_PORT}`;
