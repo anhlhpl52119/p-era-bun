@@ -1,7 +1,7 @@
 import type { MyWebviewRPCType } from "@shared/rpc";
 import { BrowserView, Utils } from "electrobun";
 import { loadUserSettings, saveUserSettings } from "../config/user-settings";
-import { runAgent } from "./agent-runner";
+import { runAgent, runWorkflow } from "./agent-runner";
 
 const activeAgents = new Map<string, AbortController>();
 
@@ -28,9 +28,9 @@ export const rpc = BrowserView.defineRPC<MyWebviewRPCType>({
       getSettings: () => loadUserSettings(),
       saveSettings: settings => saveUserSettings(settings),
       startAgent: ({ workflowId, prompt }) => {
-        if (!workflowId.trim()) {
-          throw new Error("Workflow ID cannot be empty.");
-        }
+        // if (!workflowId.trim()) {
+        //   throw new Error("Workflow ID cannot be empty.");
+        // }
 
         const normalizedPrompt = prompt.trim();
         if (!normalizedPrompt) {
@@ -44,10 +44,10 @@ export const rpc = BrowserView.defineRPC<MyWebviewRPCType>({
         const controller = new AbortController();
         activeAgents.set(workflowId, controller);
 
-        runAgent({
-          prompt: normalizedPrompt,
-          workflowId,
-          signal: controller.signal,
+        runWorkflow({
+          prompts: normalizedPrompt,
+          // workflowId,
+          abortSignal: controller.signal,
         })
           .catch((error) => {
             console.error(`Agent ${workflowId} failed:`, error);

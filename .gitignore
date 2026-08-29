@@ -7,3 +7,4 @@ artifacts/
 
 # app config (development only)
 settings.dev.json
+logs

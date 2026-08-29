@@ -1,11 +1,15 @@
 import type { EventInput } from "@shared/event";
 import type { ModelTurn } from "@shared/model";
-import type { GatewayModelId, LanguageModel, ModelMessage } from "ai";
+import type { GatewayModelId, ModelMessage } from "ai";
+import { mkdir, rm } from "node:fs/promises";
 import { EventType } from "@shared/event";
-import { createGateway, stepCountIs, streamText } from "ai";
+import { createGateway, streamText } from "ai";
 import { randomUUIDv7 } from "bun";
+import { isEmpty } from "es-toolkit/compat";
 import { logAgentError } from "@/config/diagnostics";
 import { loadUserSettings } from "@/config/user-settings";
+import { SYSTEM_PROMPTS } from "@/harness/instructions";
+import { tools } from "@/harness/tools";
 import { emit } from "@/runtime/bus";
 
 export interface RunAgentOptions {
@@ -137,7 +141,13 @@ interface RunWorkflowOptions {
   reasoning?: "provider-default" | "none" | "minimal" | "low" | "medium" | "high" | "xhigh";
 }
 
+async function cleanupLog() {
+  await rm("logs", { recursive: true, force: true });
+  await mkdir("logs");
+}
+
 export async function runWorkflow(options: RunWorkflowOptions) {
+  await cleanupLog();
   const {
     workflowId = randomUUIDv7(),
     modelId = "inclusionai/ling-3.0-flash",
@@ -152,29 +162,53 @@ export async function runWorkflow(options: RunWorkflowOptions) {
     throw new Error("Missing vercel API key");
   }
 
-  const messages: ModelMessage[]= [{
+  const messages: ModelMessage[] = [{
     role: "user",
-    content: prompts
-  }]
-  
-  try {
-    const gateway = createGateway({ apiKey: vercelAiKey });
-    const res = streamText({
-      model: gateway(modelId),
-      messages,
-      reasoning,
-      abortSignal,
-      stopWhen: stepCountIs(20)
-    });
+    content: prompts,
+  }];
 
-    for await (const chunk of res.stream) {
-      if (chunk.type === "text-delta") {
-        await emit({ type: EventType.ModelDelta, text: chunk.text, workflowId });
+  let step = 0;
+  try {
+    while (step >= 50) {
+      await Bun.write(`logs/step-${step}`, JSON.stringify(messages, null, 2));
+      const gateway = createGateway({ apiKey: vercelAiKey });
+      const res = streamText({
+        model: gateway(modelId),
+        instructions: SYSTEM_PROMPTS,
+        messages,
+        reasoning,
+        tools,
+        abortSignal,
+      });
+
+      for await (const chunk of res.stream) {
+        if (chunk.type === "text-delta") {
+          await emit({ type: EventType.ModelDelta, text: chunk.text, workflowId });
+          break;
+        }
+        if (chunk.type === "reasoning-delta") {
+          await emit({ type: EventType.ReasoningDelta, text: chunk.text, workflowId });
+          break;
+        }
+        if (chunk.type === "tool-call") {
+          await emit({ type: EventType.ToolRequested, toolCallId: chunk.toolCallId, name: chunk.toolName, args: chunk.input, workflowId });
+          break;
+        }
+        if (chunk.type === "tool-result") {
+          await emit({ type: EventType.ToolCompleted, result: chunk.output, toolCallId: chunk.toolCallId, workflowId });
+          break;
+        }
       }
-      if (chunk.type === "reasoning-delta") {
-        await emit({ type: EventType.ReasoningDelta, text: chunk.text, workflowId });
+      messages.push(...(await res.responseMessages));
+
+      const reqTools = await res.toolCalls;
+      if (isEmpty(reqTools)) {
+        const text = await res.text;
+        await emit({ type: EventType.ModelCompleted, text, workflowId });
+        await emit({ type: EventType.WorkflowCompleted, output: text, workflowId });
+        return;
       }
-      const toolRequest = chunk.
+      step++;
     }
   }
   catch (err) {

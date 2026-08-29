@@ -51,6 +51,7 @@ export function useAIStream() {
     } satisfies UIMessage);
 
     try {
+      console.log("hello");
       const stream = await startAgentStream(prompt);
       if (requestId !== submissionId) {
         await stream.cancel().catch(() => {});
@@ -64,6 +65,20 @@ export function useAIStream() {
         if (event.type === EventType.ModelDelta) {
           resMessage.parts[0].text += event.text;
           return;
+        }
+
+        if (event.type === EventType.ToolRequested) {
+          resMessage.parts.push({ type: "dynamic-tool", name: event.name });
+          return;
+        }
+
+        if (event.type === EventType.ToolCompleted) {
+          resMessage.parts.push({ type: "dynamic-tool", output: event.result });
+          return;
+        }
+
+        if (event.type === EventType.WorkflowFailed) {
+          error.value = event.error;
         }
 
         if (event.type === EventType.WorkflowFailed) {

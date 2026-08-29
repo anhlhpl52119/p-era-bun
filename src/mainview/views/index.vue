@@ -213,6 +213,10 @@ function handleRegenerate() {
               <ReasoningTrigger />
               <ReasoningContent :content="part.text" />
             </Reasoning>
+
+            <div v-if="part.type === 'dynamic-tool'" class="p4 my-4 min-w-20 bg-amber-50">
+              {{ part }}
+            </div>
           </template>
         </div>
 
