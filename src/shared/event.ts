@@ -3,6 +3,7 @@ export const EventType = {
   WorkflowStarted: "workflow.started",
   WorkflowCompleted: "workflow.completed",
   WorkflowFailed: "workflow.failed",
+  WorkflowCancelled: "workflow.cancelled",
   // the model thinking out loud (streamed token by token)
   ModelDelta: "model.delta",
   ModelCompleted: "model.completed",
@@ -33,6 +34,7 @@ export type EventInput
   = | { type: typeof EventType.WorkflowStarted; workflowId: string; input: string }
     | { type: typeof EventType.WorkflowCompleted; workflowId: string; output: string }
     | { type: typeof EventType.WorkflowFailed; workflowId: string; error: string }
+    | { type: typeof EventType.WorkflowCancelled; workflowId: string; text: string }
     | { type: typeof EventType.ModelDelta; workflowId: string; text: string }
     | { type: typeof EventType.ModelCompleted; workflowId: string; text: string }
     | { type: typeof EventType.ReasoningDelta; workflowId: string; text: string }

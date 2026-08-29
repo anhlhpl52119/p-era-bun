@@ -1,7 +1,6 @@
 import type { EventInput } from "@shared/event";
 import type { ModelTurn } from "@shared/model";
 import type { GatewayModelId, ModelMessage } from "ai";
-import { mkdir, rm } from "node:fs/promises";
 import { EventType } from "@shared/event";
 import { createGateway, streamText } from "ai";
 import { randomUUIDv7 } from "bun";
@@ -141,13 +140,7 @@ interface RunWorkflowOptions {
   reasoning?: "provider-default" | "none" | "minimal" | "low" | "medium" | "high" | "xhigh";
 }
 
-async function cleanupLog() {
-  await rm("logs", { recursive: true, force: true });
-  await mkdir("logs");
-}
-
-export async function runWorkflow(options: RunWorkflowOptions) {
-  await cleanupLog();
+export async function runWorkflow(options: RunWorkflowOptions): Promise<ModelTurn> {
   const {
     workflowId = randomUUIDv7(),
     modelId = "inclusionai/ling-3.0-flash",
@@ -156,21 +149,20 @@ export async function runWorkflow(options: RunWorkflowOptions) {
     reasoning,
   } = options;
 
-  const { vercelAiKey } = await loadUserSettings();
-  if (!vercelAiKey) {
-    await emit({ type: EventType.WorkflowFailed, workflowId, error: "Missing vercel API key in config" });
-    throw new Error("Missing vercel API key");
-  }
-
   const messages: ModelMessage[] = [{
     role: "user",
     content: prompts,
   }];
 
-  let step = 0;
   try {
-    while (step >= 50) {
-      await Bun.write(`logs/step-${step}`, JSON.stringify(messages, null, 2));
+    const { vercelAiKey } = await loadUserSettings();
+    if (!vercelAiKey) {
+      await emit({ type: EventType.WorkflowFailed, workflowId, error: "Missing vercel API key in config" });
+      throw new Error("Missing vercel API key");
+    }
+
+    let step = 0;
+    while (step < 50) {
       const gateway = createGateway({ apiKey: vercelAiKey });
       const res = streamText({
         model: gateway(modelId),
@@ -182,21 +174,28 @@ export async function runWorkflow(options: RunWorkflowOptions) {
       });
 
       for await (const chunk of res.stream) {
+        if (chunk.type === "error") {
+          await emit({ type: EventType.WorkflowFailed, workflowId, error: String(chunk.error) });
+          // AI SDK reports provider failures as a stream part. Throw the original
+          throw chunk.error;
+        }
+
+        if (chunk.type === "abort") {
+          await emit({ type: EventType.WorkflowCancelled, workflowId, text: "aborted" });
+          throw new Error(`AI provider aborted the stream: ${chunk.reason ?? "no reason supplied"}`);
+        }
+
         if (chunk.type === "text-delta") {
           await emit({ type: EventType.ModelDelta, text: chunk.text, workflowId });
-          break;
         }
         if (chunk.type === "reasoning-delta") {
           await emit({ type: EventType.ReasoningDelta, text: chunk.text, workflowId });
-          break;
         }
         if (chunk.type === "tool-call") {
           await emit({ type: EventType.ToolRequested, toolCallId: chunk.toolCallId, name: chunk.toolName, args: chunk.input, workflowId });
-          break;
         }
         if (chunk.type === "tool-result") {
           await emit({ type: EventType.ToolCompleted, result: chunk.output, toolCallId: chunk.toolCallId, workflowId });
-          break;
         }
       }
       messages.push(...(await res.responseMessages));
@@ -206,13 +205,22 @@ export async function runWorkflow(options: RunWorkflowOptions) {
         const text = await res.text;
         await emit({ type: EventType.ModelCompleted, text, workflowId });
         await emit({ type: EventType.WorkflowCompleted, output: text, workflowId });
-        return;
+        return {
+          responseMessages: await res.responseMessages,
+          text: await res.text,
+          toolCalls: reqTools.map(call => ({
+            id: call.toolCallId,
+            name: call.toolName,
+            input: call.input as any,
+          })),
+        } satisfies ModelTurn;
       }
       step++;
     }
+    return {} as any;
   }
   catch (err) {
-    emit({ type: EventType.WorkflowFailed, workflowId, error: "Call Agent failed" });
+    await emit({ type: EventType.WorkflowFailed, workflowId, error: "Call Agent failed" });
     throw err;
   }
 };

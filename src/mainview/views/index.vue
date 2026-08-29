@@ -214,9 +214,7 @@ function handleRegenerate() {
               <ReasoningContent :content="part.text" />
             </Reasoning>
 
-            <div v-if="part.type === 'dynamic-tool'" class="p4 my-4 min-w-20 bg-amber-50">
-              {{ part }}
-            </div>
+            <pre v-if="part.type === 'dynamic-tool'" class="p-4 my-4 rounded-lg text-xs max-w-100 overflow-x-auto bg-input text-primary">{{ part }}</pre>
           </template>
         </div>
 

@@ -39,5 +39,6 @@
     "index.ts": "*.ts",
     "electrobun.config.ts": "settings.*.json, components.json",
     "eslint.config.js": "eslint.config.js, .prettier*"
-  }
+  },
+  "files.autoSave": "off"
 }

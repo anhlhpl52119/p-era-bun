@@ -51,7 +51,6 @@ export function useAIStream() {
     } satisfies UIMessage);
 
     try {
-      console.log("hello");
       const stream = await startAgentStream(prompt);
       if (requestId !== submissionId) {
         await stream.cancel().catch(() => {});

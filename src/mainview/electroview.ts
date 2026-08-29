@@ -117,7 +117,6 @@ function receiveAgentEvent(event: AgentEvent): void {
 }
 
 export async function startAgentStream(prompt: string): Promise<AgentStream> {
-  console.log("start");
   const rpc = electroview.rpc;
   if (!rpc) {
     throw new Error("ElectroBun RPC is unavailable.");
