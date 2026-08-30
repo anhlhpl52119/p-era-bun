@@ -1,4 +1,4 @@
-import type { UIMessage } from "ai";
+import type { DynamicToolUIPart, TextUIPart, UIMessage } from "ai";
 import type { AgentStream } from "../electroview";
 import { EventType } from "@shared/event";
 import { uuid } from "@shared/utils";
@@ -39,16 +39,23 @@ export function useAIStream() {
     const requestId = ++submissionId;
     loading.value = true;
     error.value = null;
-    conversation.value.push({ role: "user", id: uuid(), parts: [{ type: "text", text: prompt }] });
+    conversation.value.push({
+      role: "user",
+      id: uuid(),
+      parts: [{ type: "text", text: prompt }],
+    });
+
     await disposeActiveStream(true);
+
     if (requestId !== submissionId) {
       return;
     }
-    const resMessage = reactive({
+
+    const resMessage = reactive<UIMessage>({
       role: "assistant",
       id: uuid(),
-      parts: [{ type: "text", text: "" }],
-    } satisfies UIMessage);
+      parts: [{ type: "text", text: "" }] as TextUIPart[],
+    });
 
     try {
       const stream = await startAgentStream(prompt);
@@ -67,12 +74,29 @@ export function useAIStream() {
         }
 
         if (event.type === EventType.ToolRequested) {
-          resMessage.parts.push({ type: "dynamic-tool", name: event.name });
+          resMessage.parts.push({
+            type: "dynamic-tool",
+            state: "input-streaming",
+            toolCallId: event.toolCallId,
+            toolName: event.name,
+            input: event.args,
+          });
           return;
         }
 
         if (event.type === EventType.ToolCompleted) {
-          resMessage.parts.push({ type: "dynamic-tool", output: event.result });
+          const inputPart = resMessage.parts
+            .find(p => true
+              && p.type === "dynamic-tool"
+              && p.toolCallId === event.toolCallId,
+            ) as DynamicToolUIPart;
+
+          if (!inputPart) {
+            return;
+          }
+
+          inputPart.state = "output-available";
+          inputPart.output = event.result;
           return;
         }
 

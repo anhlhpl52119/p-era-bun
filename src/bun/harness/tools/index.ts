@@ -49,7 +49,7 @@ export const tools = {
   }),
 };
 
-export async function toolTrigger(name: string, args: Record<string, unknown>): Promise<Record<string, unknown>> {
+export async function toolsTrigger(name: string, args: Record<string, unknown>): Promise<Record<string, unknown>> {
   switch (name) {
     case "searchKnowledgeBase": {
       const query = String(args.query ?? "").toLowerCase();

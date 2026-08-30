@@ -28,6 +28,7 @@ import {
 } from "@/components/ai-elements/prompt-input";
 import { Reasoning, ReasoningContent, ReasoningTrigger } from "@/components/ai-elements/reasoning";
 import { Source, Sources, SourcesContent, SourcesTrigger } from "@/components/ai-elements/sources";
+import { Tool, ToolContent, ToolHeader, ToolInput, ToolOutput, ToolStatusBadge } from "@/components/ai-elements/tool";
 import { useAIStream } from "@/composables/useAIStream";
 
 const models = [
@@ -214,7 +215,17 @@ function handleRegenerate() {
               <ReasoningContent :content="part.text" />
             </Reasoning>
 
-            <pre v-if="part.type === 'dynamic-tool'" class="p-4 my-4 rounded-lg text-xs max-w-100 overflow-x-auto bg-input text-primary">{{ part }}</pre>
+            <Tool v-if="part.type === 'dynamic-tool'">
+              <ToolHeader
+                :state="part.state || 'input-streaming'"
+                :title="part.toolName"
+                type="tool-database_query"
+              />
+              <ToolContent>
+                <ToolInput :input="part.input" />
+                <ToolOutput v-if="part.state === 'output-available'" :error-text="part.errorText" :output="part.output" />
+              </ToolContent>
+            </Tool>
           </template>
         </div>
 

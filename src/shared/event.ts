@@ -40,7 +40,7 @@ export type EventInput
     | { type: typeof EventType.ReasoningDelta; workflowId: string; text: string }
     | { type: typeof EventType.ModelReasoningCompleted; workflowId: string; text: string }
     | { type: typeof EventType.ToolRequested; workflowId: string; toolCallId: string; name: string; args: unknown }
-    | { type: typeof EventType.ToolCompleted; workflowId: string; toolCallId: string; result: unknown }
+    | { type: typeof EventType.ToolCompleted; workflowId: string; toolCallId: string; name: string; result: unknown }
     | { type: typeof EventType.ToolFailed; workflowId: string; toolCallId: string; error: string }
     | { type: typeof EventType.MemoryCompacted; workflowId: string; summarizedTurns: number; contextTokens: number; summary: string }
     | { type: typeof EventType.AgentHandoff; workflowId: string; from: string; to: string; reason: string }

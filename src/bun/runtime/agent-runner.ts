@@ -7,8 +7,8 @@ import { randomUUIDv7 } from "bun";
 import { isEmpty } from "es-toolkit/compat";
 import { logAgentError } from "@/config/diagnostics";
 import { loadUserSettings } from "@/config/user-settings";
-import { SYSTEM_PROMPTS } from "@/harness/instructions";
-import { tools } from "@/harness/tools";
+import { SYSTEM_PROMPTS } from "@/harness/prompts";
+import { tools, toolsTrigger } from "@/harness/tools";
 import { emit } from "@/runtime/bus";
 
 export interface RunAgentOptions {
@@ -133,7 +133,7 @@ export async function runAgent({
 }
 
 interface RunWorkflowOptions {
-  prompts: string;
+  prompt: string;
   workflowId?: string;
   abortSignal?: AbortSignal;
   modelId?: GatewayModelId;
@@ -144,14 +144,14 @@ export async function runWorkflow(options: RunWorkflowOptions): Promise<ModelTur
   const {
     workflowId = randomUUIDv7(),
     modelId = "inclusionai/ling-3.0-flash",
-    prompts,
+    prompt,
     abortSignal,
     reasoning,
   } = options;
 
   const messages: ModelMessage[] = [{
     role: "user",
-    content: prompts,
+    content: prompt,
   }];
 
   try {
@@ -162,7 +162,7 @@ export async function runWorkflow(options: RunWorkflowOptions): Promise<ModelTur
     }
 
     let step = 0;
-    while (step < 50) {
+    while (step < 10) {
       const gateway = createGateway({ apiKey: vercelAiKey });
       const res = streamText({
         model: gateway(modelId),
@@ -191,30 +191,31 @@ export async function runWorkflow(options: RunWorkflowOptions): Promise<ModelTur
         if (chunk.type === "reasoning-delta") {
           await emit({ type: EventType.ReasoningDelta, text: chunk.text, workflowId });
         }
-        if (chunk.type === "tool-call") {
-          await emit({ type: EventType.ToolRequested, toolCallId: chunk.toolCallId, name: chunk.toolName, args: chunk.input, workflowId });
-        }
-        if (chunk.type === "tool-result") {
-          await emit({ type: EventType.ToolCompleted, result: chunk.output, toolCallId: chunk.toolCallId, workflowId });
-        }
       }
       messages.push(...(await res.responseMessages));
 
-      const reqTools = await res.toolCalls;
-      if (isEmpty(reqTools)) {
+      const toolCalls = await res.toolCalls;
+      if (isEmpty(toolCalls)) {
         const text = await res.text;
         await emit({ type: EventType.ModelCompleted, text, workflowId });
         await emit({ type: EventType.WorkflowCompleted, output: text, workflowId });
         return {
           responseMessages: await res.responseMessages,
           text: await res.text,
-          toolCalls: reqTools.map(call => ({
-            id: call.toolCallId,
-            name: call.toolName,
-            input: call.input as any,
+          toolCalls: toolCalls.map(tc => ({
+            id: tc.toolCallId,
+            name: tc.toolName,
+            input: tc.input as any,
           })),
         } satisfies ModelTurn;
       }
+
+      for (const tc of toolCalls) {
+        await emit({ type: EventType.ToolRequested, toolCallId: tc.toolCallId, name: tc.toolName, args: tc.input, workflowId });
+        const output = await toolsTrigger(tc.toolName, tc.input as Record<string, unknown>);
+        await emit({ type: EventType.ToolCompleted, result: output, toolCallId: tc.toolCallId, name: tc.toolName, workflowId });
+      }
+
       step++;
     }
     return {} as any;
