@@ -45,7 +45,7 @@ export const rpc = BrowserView.defineRPC<MyWebviewRPCType>({
         activeAgents.set(workflowId, controller);
 
         runWorkflow({
-          prompts: normalizedPrompt,
+          prompt: normalizedPrompt,
           workflowId,
           abortSignal: controller.signal,
           // signal: controller.signal,
