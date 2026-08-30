@@ -73,6 +73,7 @@ export const rpc = BrowserView.defineRPC<MyWebviewRPCType>({
     },
     messages: {
       "*": (messageName, payload) => {
+        // handle message from `client` ->  `bun`
         console.warn("global message handler", messageName, payload);
       },
     },
