@@ -1,7 +1,7 @@
 import type { MyWebviewRPCType } from "@shared/rpc";
 import { BrowserView, Utils } from "electrobun";
 import { loadUserSettings, saveUserSettings } from "../config/user-settings";
-import { runAgent, runWorkflow } from "./agent-runner";
+import { runWorkflow } from "./agent-runner";
 
 const activeAgents = new Map<string, AbortController>();
 

@@ -1,4 +1,6 @@
 import type { AgentEvent } from "@shared/event";
+import { DevToolsTelemetry } from "@ai-sdk/devtools";
+import { registerTelemetry } from "ai";
 import { ApplicationMenu, BrowserWindow, Updater } from "electrobun/bun";
 import { subscribe } from "@/runtime/bus";
 import { rpc } from "@/runtime/rpc";
@@ -67,6 +69,8 @@ async function main() {
   subscribe((event: AgentEvent) => {
     bw.webview.rpc?.send.agentEvent(event);
   });
+
+  registerTelemetry(DevToolsTelemetry());
 
   console.warn("🌐 Bun started!! ");
 }

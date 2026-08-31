@@ -28,7 +28,7 @@ import {
 } from "@/components/ai-elements/prompt-input";
 import { Reasoning, ReasoningContent, ReasoningTrigger } from "@/components/ai-elements/reasoning";
 import { Source, Sources, SourcesContent, SourcesTrigger } from "@/components/ai-elements/sources";
-import { Tool, ToolContent, ToolHeader, ToolInput, ToolOutput, ToolStatusBadge } from "@/components/ai-elements/tool";
+import { Tool, ToolContent, ToolHeader, ToolInput, ToolOutput } from "@/components/ai-elements/tool";
 import { useAIStream } from "@/composables/useAIStream";
 
 const models = [
@@ -57,29 +57,6 @@ const lastAssistantMessageId = computed(() => {
 
 async function handleSubmit(message: PromptInputMessage) {
   await submit(message.text);
-  // const hasText = Boolean(message.text?.trim());
-  // const hasAttachments = Boolean(message.files?.length);
-
-  // if (!hasText && !hasAttachments) {}
-  // return;
-
-  // try {
-  //   await chat.sendMessage(
-  //     {
-  //       text: hasText ? message.text : "Sent with attachments",
-  //       files: hasAttachments ? message.files : undefined,
-  //     },
-  //     {
-  //       body: {
-  //         model: model.value,
-  //         webSearch: webSearch.value,
-  //       },
-  //     },
-  //   );
-  // }
-  // catch (error) {
-  //   console.error("Failed to send message", error);
-  // }
 }
 
 function handlePromptError(error: { code: string; message: string }) {
