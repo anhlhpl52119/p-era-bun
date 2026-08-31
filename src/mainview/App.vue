@@ -51,6 +51,7 @@ const layouts: Record<string, any> = {
     />
 
     <!-- layout -->
+
     <component
       :is="layouts[route.meta.layout as string || 'default']"
       v-else

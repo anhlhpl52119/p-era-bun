@@ -1,12 +1,25 @@
 <script setup lang="ts">
 import type { ChatStatus, SourceUrlUIPart, UIMessage } from "ai";
 import type { PromptInputMessage } from "@/components/ai-elements/prompt-input";
-import { CopyIcon, GlobeIcon, RefreshCcwIcon } from "@lucide/vue";
-import { computed, ref } from "vue";
-
+import { Check, CopyIcon, GlobeIcon, RefreshCcwIcon } from "@lucide/vue";
+import { multiply, round } from "es-toolkit/compat";
+import { computed, onMounted, ref } from "vue";
 import { Conversation, ConversationContent, ConversationScrollButton } from "@/components/ai-elements/conversation";
 import { Loader } from "@/components/ai-elements/loader";
 import { Message, MessageAction, MessageActions, MessageContent, MessageResponse } from "@/components/ai-elements/message";
+import {
+  ModelSelector,
+  ModelSelectorContent,
+  ModelSelectorEmpty,
+  ModelSelectorGroup,
+  ModelSelectorInput,
+  ModelSelectorItem,
+  ModelSelectorList,
+  ModelSelectorLogo,
+  ModelSelectorLogoGroup,
+  ModelSelectorName,
+  ModelSelectorTrigger,
+} from "@/components/ai-elements/model-selector";
 import {
   PromptInput,
   PromptInputActionAddAttachments,
@@ -16,11 +29,6 @@ import {
   PromptInputBody,
   PromptInputButton,
   PromptInputFooter,
-  PromptInputSelect,
-  PromptInputSelectContent,
-  PromptInputSelectItem,
-  PromptInputSelectTrigger,
-  PromptInputSelectValue,
   PromptInputSubmit,
   PromptInputTextarea,
   PromptInputTools,
@@ -29,15 +37,23 @@ import {
 import { Reasoning, ReasoningContent, ReasoningTrigger } from "@/components/ai-elements/reasoning";
 import { Source, Sources, SourcesContent, SourcesTrigger } from "@/components/ai-elements/sources";
 import { Tool, ToolContent, ToolHeader, ToolInput, ToolOutput } from "@/components/ai-elements/tool";
+import { Button } from "@/components/ui/button";
 import { useAIStream } from "@/composables/useAIStream";
 
-const models = [
-  { name: "GPT 4o", value: "openai/gpt-4o" },
-  { name: "Deepseek R1", value: "deepseek/deepseek-r1" },
-] as const;
+interface Model {
+  id: string;
+  name: string;
+  chef: string;
+  owner: string;
+  providers: string[];
+  pricing: {
+    input: number;
+    output: number;
+    input_cache_write: number | null;
+    input_cache_read: number | null;
+  };
+}
 
-// const chat = new Chat({});
-const model = ref(models[0].value);
 const webSearch = ref(false);
 const { conversation, loading, submit } = useAIStream();
 
@@ -120,14 +136,51 @@ async function copyToClipboard(text: string) {
   }
 }
 
-function handleRegenerate() {
-  // chat.regenerate({
-  //   body: {
-  //     model: model.value,
-  //     webSearch: webSearch.value,
-  //   },
-  // });
+const open = ref(false);
+const selectedModel = ref<string>("gpt-4o");
+
+const supportedModels = ref<Model[]>([]);
+
+const selectedModelData = computed(() => supportedModels.value.find(m => m.id === selectedModel.value));
+const chefs = computed(() => Array.from(new Set(supportedModels.value.map(model => model.chef))));
+
+function handleSelect(id: string) {
+  selectedModel.value = id;
+  open.value = false;
 }
+
+function handleRegenerate() {}
+
+onMounted(async () => {
+  try {
+    const { data: models } = await fetch("https://ai-gateway.vercel.sh/v1/models")
+      .then(res => res.json());
+
+    const conversionRate = 1_000_000;
+    // filter language model https://vercel.com/docs/ai-gateway/models-and-providers#filtering-models-by-type
+    const textModels: Model[] = models
+      .filter((m: any) => m.type === "language") // filter `language model`
+      .map((m: any) => ({
+        id: m.id,
+        name: m.name,
+        chef: m.owned_by,
+        owner: m.owned_by,
+        providers: [],
+        pricing: {
+          input: round(multiply(conversionRate, Number(m.pricing.input)), 2),
+          output: round(multiply(conversionRate, Number(m.pricing.output)), 2),
+          input_cache_read: round(multiply(conversionRate, Number(m.pricing.input_cache_read)), 2),
+          input_cache_write: round(multiply(conversionRate, Number(m.pricing.input_cache_write)), 2),
+        },
+      }));
+
+    supportedModels.value = textModels.slice();
+    selectedModel.value = textModels[0].id;
+  }
+  catch (err) {
+    console.error(err);
+  }
+});
 </script>
 
 <template>
@@ -152,11 +205,11 @@ function handleRegenerate() {
               />
             </SourcesContent>
           </Sources>
-
           <template
             v-for="(part, partIndex) in message.parts"
             :key="`${message.id}-${partIndex}`"
           >
+            {{ message.parts }}
             <Message
               v-if="part.type === 'text'"
               :from="message.role"
@@ -234,20 +287,50 @@ function handleRegenerate() {
             <span>Search</span>
           </PromptInputButton>
 
-          <PromptInputSelect v-model="model">
-            <PromptInputSelectTrigger>
-              <PromptInputSelectValue />
-            </PromptInputSelectTrigger>
-            <PromptInputSelectContent>
-              <PromptInputSelectItem
-                v-for="item in models"
-                :key="item.value"
-                :value="item.value"
-              >
-                {{ item.name }}
-              </PromptInputSelectItem>
-            </PromptInputSelectContent>
-          </PromptInputSelect>
+          <ModelSelector v-model:open="open">
+            <ModelSelectorTrigger>
+              <Button class="w-[200px] justify-between" variant="outline">
+                <ModelSelectorLogo v-if="selectedModelData?.owner" :provider="selectedModelData.owner" />
+                <ModelSelectorName>{{ selectedModelData?.name }}</ModelSelectorName>
+              </Button>
+            </ModelSelectorTrigger>
+
+            <ModelSelectorContent>
+              <ModelSelectorInput placeholder="Search models..." />
+
+              <ModelSelectorList>
+                <ModelSelectorEmpty>No models found.</ModelSelectorEmpty>
+
+                <ModelSelectorGroup
+                  v-for="chef in chefs"
+                  :key="chef"
+                  :heading="chef"
+                >
+                  <ModelSelectorItem
+                    v-for="model in supportedModels.filter(m => m.chef === chef)"
+                    :key="model.id"
+                    :value="model.id"
+                    @select="handleSelect(model.id)"
+                  >
+                    <ModelSelectorLogo :provider="model.owner" />
+                    <ModelSelectorName>{{ model.name }}</ModelSelectorName>
+                    <!-- <ModelSelectorLogoGroup>
+                      <ModelSelectorLogo
+                        v-for="provider in model.providers"
+                        :key="provider"
+                        :provider="provider"
+                      />
+                    </ModelSelectorLogoGroup> -->
+                    <div class="text-xs opacity-20">
+                      {{ model.pricing.input }}$ / {{ model.pricing.output }}$
+                    </div>
+                    <Check v-if="selectedModel === model.id" class="ml-auto size-4" />
+                    <div v-else class="ml-auto size-4" />
+                  </ModelSelectorItem>
+                </ModelSelectorGroup>
+              </ModelSelectorList>
+            </ModelSelectorContent>
+          </ModelSelector>
         </PromptInputTools>
 
         <PromptInputSubmit

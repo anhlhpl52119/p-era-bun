@@ -3,6 +3,7 @@ import type { AgentStream } from "../electroview";
 import { EventType } from "@shared/event";
 import { uuid } from "@shared/utils";
 import { last } from "es-toolkit/array";
+import { isEmpty } from "es-toolkit/compat";
 import { onUnmounted, reactive, ref } from "vue";
 import { startAgentStream } from "../electroview";
 
@@ -37,6 +38,9 @@ export function useAIStream() {
   }
 
   async function submit(prompt: string) {
+    if (isEmpty(prompt.trim())) {
+      return;
+    }
     const requestId = ++submissionId;
     loading.value = true;
     error.value = null;

@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@ai-sdk/devtools": "^1.0.14",
-    "@lucide/vue": "^1.34.0",
+    "@lucide/vue": "^1.38.0",
     "@rive-app/webgl2": "^2.40.1",
     "@tailwindcss/vite": "^4.3.3",
     "@vue-flow/background": "^1.3.2",
