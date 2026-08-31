@@ -70,6 +70,7 @@ async function main() {
     bw.webview.rpc?.send.agentEvent(event);
   });
 
+  // devtool
   registerTelemetry(DevToolsTelemetry());
 
   console.warn("🌐 Bun started!! ");

@@ -55,7 +55,9 @@ const layouts: Record<string, any> = {
       :is="layouts[route.meta.layout as string || 'default']"
       v-else
     >
-      <component :is="Component" />
+      <KeepAlive>
+        <component :is="Component" />
+      </KeepAlive>
     </component>
   </RouterView>
 </template>

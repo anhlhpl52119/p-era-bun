@@ -2,6 +2,7 @@ import type { DynamicToolUIPart, TextUIPart, UIMessage } from "ai";
 import type { AgentStream } from "../electroview";
 import { EventType } from "@shared/event";
 import { uuid } from "@shared/utils";
+import { last } from "es-toolkit/array";
 import { onUnmounted, reactive, ref } from "vue";
 import { startAgentStream } from "../electroview";
 
@@ -69,7 +70,13 @@ export function useAIStream() {
       let endedWhileSubscribing = false;
       const streamUnsubscribe = stream.subscribe((event) => {
         if (event.type === EventType.ModelDelta) {
-          resMessage.parts[0].text += event.text;
+          const latestPart = last(resMessage.parts);
+          if (latestPart?.type === "text") {
+            latestPart.text += event.text;
+          }
+          else {
+            resMessage.parts.push({ type: "text", text: event.text });
+          }
           return;
         }
 
