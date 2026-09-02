@@ -16,7 +16,6 @@ import {
   ModelSelectorItem,
   ModelSelectorList,
   ModelSelectorLogo,
-  ModelSelectorLogoGroup,
   ModelSelectorName,
   ModelSelectorTrigger,
 } from "@/components/ai-elements/model-selector";
@@ -289,7 +288,7 @@ onMounted(async () => {
 
           <ModelSelector v-model:open="open">
             <ModelSelectorTrigger>
-              <Button class="w-[200px] justify-between" variant="outline">
+              <Button class="w-50 justify-between" variant="outline">
                 <ModelSelectorLogo v-if="selectedModelData?.owner" :provider="selectedModelData.owner" />
                 <ModelSelectorName>{{ selectedModelData?.name }}</ModelSelectorName>
               </Button>
