@@ -37,7 +37,7 @@ export function useAIStream() {
     stream.dispose();
   }
 
-  async function submit(prompt: string) {
+  async function submit(prompt: string, modelId: string) {
     if (isEmpty(prompt.trim())) {
       return;
     }
@@ -63,7 +63,7 @@ export function useAIStream() {
     });
 
     try {
-      const stream = await startAgentStream(prompt);
+      const stream = await startAgentStream(prompt, modelId);
       if (requestId !== submissionId) {
         await stream.cancel().catch(() => {});
         stream.dispose();

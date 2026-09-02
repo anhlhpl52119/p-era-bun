@@ -27,7 +27,7 @@ export const rpc = BrowserView.defineRPC<MyWebviewRPCType>({
       },
       getSettings: () => loadUserSettings(),
       saveSettings: settings => saveUserSettings(settings),
-      startAgent: ({ workflowId, prompt }) => {
+      startAgent: ({ workflowId, prompt, modelId }) => {
         if (!workflowId.trim()) {
           throw new Error("Workflow ID cannot be empty.");
         }
@@ -48,6 +48,7 @@ export const rpc = BrowserView.defineRPC<MyWebviewRPCType>({
           prompt: normalizedPrompt,
           workflowId,
           abortSignal: controller.signal,
+          modelId,
           // signal: controller.signal,
         })
           .catch((error) => {

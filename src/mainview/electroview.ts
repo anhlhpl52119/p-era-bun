@@ -116,7 +116,7 @@ function receiveAgentEvent(event: AgentEvent): void {
   }
 }
 
-export async function startAgentStream(prompt: string): Promise<AgentStream> {
+export async function startAgentStream(prompt: string, modelId: string): Promise<AgentStream> {
   const rpc = electroview.rpc;
   if (!rpc) {
     throw new Error("ElectroBun RPC is unavailable.");
@@ -125,9 +125,8 @@ export async function startAgentStream(prompt: string): Promise<AgentStream> {
   const workflowId = crypto.randomUUID();
   const stream = createAgentStream(workflowId);
   streams.set(workflowId, stream);
-
   try {
-    const result = await rpc.request.startAgent({ workflowId, prompt });
+    const result = await rpc.request.startAgent({ workflowId, prompt, modelId });
     if (!result.accepted) {
       throw new Error(`Agent workflow ${workflowId} was not accepted.`);
     }

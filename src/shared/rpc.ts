@@ -22,6 +22,7 @@ export interface MyWebviewRPCType {
         params: {
           workflowId: string;
           prompt: string;
+          modelId: string;
         };
         response: {
           workflowId: string;

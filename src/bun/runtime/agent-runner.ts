@@ -9,12 +9,6 @@ import { SYSTEM_PROMPTS } from "@/harness/prompts";
 import { tools, toolsTrigger } from "@/harness/tools";
 import { emit } from "@/runtime/bus";
 
-export interface RunAgentOptions {
-  prompt: string;
-  workflowId: string;
-  signal?: AbortSignal;
-}
-
 interface RunWorkflowOptions {
   prompt: string;
   workflowId?: string;

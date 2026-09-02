@@ -70,8 +70,16 @@ const lastAssistantMessageId = computed(() => {
   return null;
 });
 
+const open = ref(false);
+const selectedModel = ref<string>("minimax/minimax-m3-free");
+
+const supportedModels = ref<Model[]>([]);
+
+const selectedModelData = computed(() => supportedModels.value.find(m => m.id === selectedModel.value));
+const chefs = computed(() => Array.from(new Set(supportedModels.value.map(model => model.chef))));
+
 async function handleSubmit(message: PromptInputMessage) {
-  await submit(message.text);
+  await submit(message.text, selectedModel.value);
 }
 
 function handlePromptError(error: { code: string; message: string }) {
@@ -135,14 +143,6 @@ async function copyToClipboard(text: string) {
   }
 }
 
-const open = ref(false);
-const selectedModel = ref<string>("gpt-4o");
-
-const supportedModels = ref<Model[]>([]);
-
-const selectedModelData = computed(() => supportedModels.value.find(m => m.id === selectedModel.value));
-const chefs = computed(() => Array.from(new Set(supportedModels.value.map(model => model.chef))));
-
 function handleSelect(id: string) {
   selectedModel.value = id;
   open.value = false;
@@ -174,6 +174,10 @@ onMounted(async () => {
       }));
 
     supportedModels.value = textModels.slice();
+    const hasDefaultModel = textModels.some(m => m.id === selectedModel.value);
+    if (hasDefaultModel) {
+      return;
+    }
     selectedModel.value = textModels[0].id;
   }
   catch (err) {
@@ -208,7 +212,6 @@ onMounted(async () => {
             v-for="(part, partIndex) in message.parts"
             :key="`${message.id}-${partIndex}`"
           >
-            {{ message.parts }}
             <Message
               v-if="part.type === 'text'"
               :from="message.role"
