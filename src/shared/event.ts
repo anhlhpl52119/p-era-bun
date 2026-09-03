@@ -31,29 +31,28 @@ export const EventType = {
 } as const;
 
 export type EventInput
-  = | { type: typeof EventType.WorkflowStarted; workflowId: string; input: string }
-    | { type: typeof EventType.WorkflowCompleted; workflowId: string; output: string }
-    | { type: typeof EventType.WorkflowFailed; workflowId: string; error: string }
-    | { type: typeof EventType.WorkflowCancelled; workflowId: string; text: string }
-    | { type: typeof EventType.ModelDelta; workflowId: string; text: string }
-    | { type: typeof EventType.ModelCompleted; workflowId: string; text: string }
-    | { type: typeof EventType.ReasoningDelta; workflowId: string; text: string }
-    | { type: typeof EventType.ModelReasoningCompleted; workflowId: string; text: string }
-    | { type: typeof EventType.ToolRequested; workflowId: string; toolCallId: string; name: string; args: unknown }
-    | { type: typeof EventType.ToolCompleted; workflowId: string; toolCallId: string; name: string; result: unknown }
-    | { type: typeof EventType.ToolFailed; workflowId: string; toolCallId: string; error: string }
-    | { type: typeof EventType.MemoryCompacted; workflowId: string; summarizedTurns: number; contextTokens: number; summary: string }
-    | { type: typeof EventType.AgentHandoff; workflowId: string; from: string; to: string; reason: string }
-    | { type: typeof EventType.PlanCreated; workflowId: string; steps: { id: string; agent: string; objective: string }[] }
-    | { type: typeof EventType.SubagentStarted; workflowId: string; stepId: string; agent: string; objective: string }
-    | { type: typeof EventType.SubagentCompleted; workflowId: string; stepId: string; agent: string; findings: string }
-    | { type: typeof EventType.SubagentFailed; workflowId: string; stepId: string; agent: string; error: string }
-    | { type: typeof EventType.ApprovalRequested; workflowId: string; toolCallId: string; action: string; args: unknown }
-    | { type: typeof EventType.ApprovalResolved; workflowId: string; toolCallId: string; approved: boolean }
-    | { type: typeof EventType.Log; workflowId?: string; level: "info" | "warn" | "error"; message: string };
+  = | { type: typeof EventType.WorkflowStarted; input: string }
+    | { type: typeof EventType.WorkflowCompleted; output: string }
+    | { type: typeof EventType.WorkflowFailed; error: string }
+    | { type: typeof EventType.WorkflowCancelled; text: string }
+    | { type: typeof EventType.ModelDelta; text: string }
+    | { type: typeof EventType.ModelCompleted; text: string }
+    | { type: typeof EventType.ReasoningDelta; text: string }
+    | { type: typeof EventType.ModelReasoningCompleted; text: string }
+    | { type: typeof EventType.ToolRequested; toolCallId: string; name: string; args: unknown }
+    | { type: typeof EventType.ToolCompleted; toolCallId: string; name: string; result: unknown }
+    | { type: typeof EventType.ToolFailed; toolCallId: string; error: string }
+    | { type: typeof EventType.MemoryCompacted; summarizedTurns: number; contextTokens: number; summary: string }
+    | { type: typeof EventType.AgentHandoff; from: string; to: string; reason: string }
+    | { type: typeof EventType.PlanCreated; steps: { id: string; agent: string; objective: string }[] }
+    | { type: typeof EventType.SubagentStarted; stepId: string; agent: string; objective: string }
+    | { type: typeof EventType.SubagentCompleted; stepId: string; agent: string; findings: string }
+    | { type: typeof EventType.SubagentFailed; stepId: string; agent: string; error: string }
+    | { type: typeof EventType.ApprovalRequested; toolCallId: string; action: string; args: unknown }
+    | { type: typeof EventType.ApprovalResolved; toolCallId: string; approved: boolean };
 
 // The harness stamps every event with an id + timestamp when it emits.
-export type AgentEvent = EventInput & { id: string; ts: number };
+export type AgentEvent = EventInput & { id: string; ts: number; workflowId: string };
 
 // What harness code calls to push an event onto the stream.
 export type Emit = (event: EventInput) => Promise<void>;
